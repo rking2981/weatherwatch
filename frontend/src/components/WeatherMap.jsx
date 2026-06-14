@@ -9,7 +9,7 @@ import XYZ from 'ol/source/XYZ';
 import TileWMS from 'ol/source/TileWMS';
 import GeoJSON from 'ol/format/GeoJSON';
 import { fromLonLat, transformExtent } from 'ol/proj';
-import { Style, Fill, Stroke } from 'ol/style';
+import { Style, Fill, Stroke, Text } from 'ol/style';
 import { defaults as defaultControls } from 'ol/control';
 import RadarLegend from './RadarLegend';
 import 'ol/ol.css';
@@ -63,6 +63,55 @@ const EVENT_COLORS = {
   'Dust Storm Warning':                 { stroke: '#c2a04b', fill: 'rgba(194,160,75,0.2)',      width: 2 },
 };
 
+const EVENT_ICONS = {
+  // Tornado
+  'Tornado Warning':               '🌪',
+  'Tornado Watch':                 '🌪',
+  'Tornado Emergency':             '🌪',
+  // Severe Thunderstorm
+  'Severe Thunderstorm Warning':   '⛈',
+  'Severe Thunderstorm Watch':     '⛈',
+  // Flood
+  'Flash Flood Warning':           '🌊',
+  'Flash Flood Watch':             '🌊',
+  'Flash Flood Emergency':         '🌊',
+  'Flood Warning':                 '💧',
+  'Flood Watch':                   '💧',
+  'Flood Advisory':                '💧',
+  'Hydrologic Outlook':            '💧',
+  // Winter
+  'Blizzard Warning':              '🌨',
+  'Winter Storm Warning':          '❄',
+  'Winter Storm Watch':            '❄',
+  'Winter Weather Advisory':       '❄',
+  'Ice Storm Warning':             '🧊',
+  'Freezing Rain Advisory':        '🧊',
+  'Wind Chill Warning':            '🥶',
+  'Wind Chill Advisory':           '🥶',
+  // Wind
+  'Extreme Wind Warning':          '💨',
+  'High Wind Warning':             '💨',
+  'High Wind Watch':               '💨',
+  'Wind Advisory':                 '💨',
+  // Heat
+  'Excessive Heat Warning':        '🌡',
+  'Excessive Heat Watch':          '🌡',
+  'Heat Advisory':                 '🌡',
+  // Fog / Air
+  'Dense Fog Advisory':            '🌫',
+  'Air Quality Alert':             '😷',
+  // Tropical
+  'Hurricane Warning':             '🌀',
+  'Hurricane Watch':               '🌀',
+  'Tropical Storm Warning':        '🌀',
+  'Tropical Storm Watch':          '🌀',
+  // Other
+  'Tsunami Warning':               '🌊',
+  'Dust Storm Warning':            '🌪',
+  'Special Weather Statement':     '⚠',
+  'Special Marine Warning':        '⚓',
+};
+
 const DESTRUCTIVE_WIND_MPH = 80;
 
 function alertStyle(feature) {
@@ -84,9 +133,18 @@ function alertStyle(feature) {
     ? { stroke: '#ff4500', fill: 'rgba(255,69,0,0.3)', width: 3 }
     : EVENT_COLORS[event] || { stroke: '#78909c', fill: 'rgba(120,144,156,0.15)', width: 1.5 };
 
+  const icon = EVENT_ICONS[event];
+
   return new Style({
     fill:   new Fill({ color: colors.fill }),
     stroke: new Stroke({ color: colors.stroke, width: colors.width }),
+    text: icon ? new Text({
+      text: icon,
+      font: '22px sans-serif',
+      offsetY: 0,
+      placement: 'point',
+      overflow: true,
+    }) : undefined,
   });
 }
 
@@ -270,13 +328,21 @@ export default function WeatherMap({ alerts, selectedAlert, topAlert, pulseAlert
       source.getFeatures().forEach(feature => {
         const fid = feature.get('id') || feature.getId();
         if (fid === pulseAlertId) {
-          const base = EVENT_COLORS[feature.get('event')] || { stroke: '#ffffff', fill: 'rgba(255,255,255,0.2)', width: 2 };
+          const ev   = feature.get('event');
+          const base = EVENT_COLORS[ev] || { stroke: '#ffffff', fill: 'rgba(255,255,255,0.2)', width: 2 };
+          const icon = EVENT_ICONS[ev];
           feature.setStyle(new Style({
             fill: new Fill({ color: base.fill }),
             stroke: new Stroke({
               color: bright ? '#ffffff' : base.stroke,
               width: bright ? base.width + 2.5 : base.width,
             }),
+            text: icon ? new Text({
+              text: icon,
+              font: '22px sans-serif',
+              placement: 'point',
+              overflow: true,
+            }) : undefined,
           }));
         } else {
           feature.setStyle(null);
