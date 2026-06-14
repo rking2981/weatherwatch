@@ -1,9 +1,7 @@
 // Text-to-speech for weather alerts using the Web Speech API.
-// Reads: event name, affected counties, NWS instruction or safety steps.
-// Sentences are queued as separate utterances with a short pause between each.
+// One utterance per alert — TTS engine pauses naturally at punctuation.
 
 let speaking = false;
-let pauseTimers = [];
 
 function getBestVoice() {
   const voices = window.speechSynthesis.getVoices();
@@ -42,16 +40,8 @@ const STATE_NAMES = {
   DC: 'Washington D.C.',
 };
 
-// NWS text abbreviations → spoken equivalents (for instruction text)
+// NWS unit/direction abbreviations → spoken equivalents
 const NWS_ABBREVS = [
-  [/\bNM\b/g,   'nautical miles'],
-  [/\bKT\b/g,   'knots'],
-  [/\bMPH\b/g,  'miles per hour'],
-  [/\bMPG\b/g,  'miles per gallon'],
-  [/\bFT\b/g,   'feet'],
-  [/\bIN\b/g,   'inches'],
-  [/\bF\b/g,    'degrees Fahrenheit'],
-  [/\bC\b/g,    'degrees Celsius'],
   [/\bWSW\b/g,  'west-southwest'],
   [/\bWNW\b/g,  'west-northwest'],
   [/\bENE\b/g,  'east-northeast'],
@@ -64,10 +54,11 @@ const NWS_ABBREVS = [
   [/\bNE\b/g,   'northeast'],
   [/\bSW\b/g,   'southwest'],
   [/\bSE\b/g,   'southeast'],
-  [/\bN\b/g,    'north'],
-  [/\bS\b/g,    'south'],
-  [/\bE\b/g,    'east'],
-  [/\bW\b/g,    'west'],
+  [/\bMPH\b/g,  'miles per hour'],
+  [/\bKT\b/g,   'knots'],
+  [/\bFT\b/g,   'feet'],
+  // NM only in context of distance — "NM" after a number
+  [/(\d+)\s*NM\b/g, '$1 nautical miles'],
 ];
 
 function expandAbbrevs(text) {
@@ -78,17 +69,15 @@ function expandAbbrevs(text) {
   return out;
 }
 
-function expandAreaDesc(areaDesc) {
-  // areaDesc entries look like "Cherokee, KS" or "Jasper, MO"
-  return areaDesc.replace(/\b([A-Z]{2})\b/g, (match) => STATE_NAMES[match] || match);
+function expandAreaDesc(text) {
+  return text.replace(/\b([A-Z]{2})\b/g, m => STATE_NAMES[m] || m);
 }
 
-function buildSentences(event, areaDesc, instruction, safetySteps) {
-  const sentences = [];
+function buildScript(event, areaDesc, instruction, safetySteps) {
+  const parts = [];
 
-  sentences.push('Attention. Weather alert.');
-
-  if (event) sentences.push(`${event}.`);
+  parts.push('Attention. Weather alert.');
+  if (event) parts.push(`${event}.`);
 
   if (areaDesc) {
     const counties = areaDesc
@@ -97,81 +86,50 @@ function buildSentences(event, areaDesc, instruction, safetySteps) {
       .filter(Boolean)
       .slice(0, 6)
       .join(', ');
-    sentences.push(`Affected areas: ${counties}.`);
+    parts.push(`Affected areas: ${counties}.`);
   }
 
   if (instruction && instruction.trim().length > 10) {
-    // Split NWS instruction on sentence boundaries for individual pauses
-    const chunks = expandAbbrevs(instruction.trim())
-      .split(/(?<=[.!?])\s+/)
-      .map(s => s.trim())
-      .filter(Boolean);
-    sentences.push(...chunks);
+    let text = expandAbbrevs(instruction.trim());
+    if (!/[.!?]$/.test(text)) text += '.';
+    parts.push(text);
   } else if (safetySteps && safetySteps.length > 0) {
-    sentences.push('Safety instructions.');
-    safetySteps.forEach((step, i) => {
-      sentences.push(`${i + 1}. ${step}`);
+    parts.push('Safety instructions.');
+    safetySteps.forEach(step => {
+      const s = step.trim();
+      parts.push(/[.!?]$/.test(s) ? s : `${s}.`);
     });
   }
 
-  return sentences;
-}
-
-function makeUtterance(text, voice) {
-  const utter = new SpeechSynthesisUtterance(text);
-  if (voice) utter.voice = voice;
-  utter.rate = 0.92;
-  utter.pitch = 1.0;
-  utter.volume = 1.0;
-  utter.lang = 'en-US';
-  return utter;
-}
-
-// Queue sentences with a 400ms pause between each
-function queueSentences(sentences, voice) {
-  let delay = 0;
-  sentences.forEach((text, i) => {
-    const utter = makeUtterance(text, voice);
-
-    if (i === sentences.length - 1) {
-      utter.onend = () => { speaking = false; };
-    }
-    utter.onerror = () => { speaking = false; };
-
-    if (i === 0) {
-      window.speechSynthesis.speak(utter);
-    } else {
-      // Pause: speak a near-silent utterance as a gap, then the real sentence
-      const pause = makeUtterance(' ', voice); // non-breaking space
-      pause.rate = 10; // speak it instantly
-      pause.volume = 0;
-      pause.onend = () => {
-        const t = setTimeout(() => {
-          if (speaking) window.speechSynthesis.speak(utter);
-        }, 350);
-        pauseTimers.push(t);
-      };
-      window.speechSynthesis.speak(pause);
-    }
-  });
+  return parts.join(' ');
 }
 
 export function speakAlert({ event, areaDesc, instruction, safetySteps }) {
   if (!window.speechSynthesis) return;
 
   window.speechSynthesis.cancel();
-  pauseTimers.forEach(clearTimeout);
-  pauseTimers = [];
   speaking = true;
 
-  const sentences = buildSentences(event, areaDesc, instruction, safetySteps);
+  const text = buildScript(event, areaDesc, instruction, safetySteps);
+
+  const go = (voice) => {
+    const utter = new SpeechSynthesisUtterance(text);
+    if (voice) utter.voice = voice;
+    utter.rate = 0.9;
+    utter.pitch = 1.0;
+    utter.volume = 1.0;
+    utter.lang = 'en-US';
+    utter.onend  = () => { speaking = false; };
+    utter.onerror = () => { speaking = false; };
+    window.speechSynthesis.speak(utter);
+  };
 
   const voices = window.speechSynthesis.getVoices();
   if (voices.length > 0) {
-    queueSentences(sentences, getBestVoice());
+    go(getBestVoice());
   } else {
     window.speechSynthesis.onvoiceschanged = () => {
-      queueSentences(sentences, getBestVoice());
+      go(getBestVoice());
       window.speechSynthesis.onvoiceschanged = null;
     };
   }
@@ -179,8 +137,6 @@ export function speakAlert({ event, areaDesc, instruction, safetySteps }) {
 
 export function stopSpeech() {
   if (window.speechSynthesis) window.speechSynthesis.cancel();
-  pauseTimers.forEach(clearTimeout);
-  pauseTimers = [];
   speaking = false;
 }
 
