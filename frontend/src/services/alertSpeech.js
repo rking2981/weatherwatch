@@ -27,6 +27,62 @@ function getBestVoice() {
   return null;
 }
 
+// US state abbreviations → full names (for areaDesc)
+const STATE_NAMES = {
+  AL: 'Alabama', AK: 'Alaska', AZ: 'Arizona', AR: 'Arkansas', CA: 'California',
+  CO: 'Colorado', CT: 'Connecticut', DE: 'Delaware', FL: 'Florida', GA: 'Georgia',
+  HI: 'Hawaii', ID: 'Idaho', IL: 'Illinois', IN: 'Indiana', IA: 'Iowa',
+  KS: 'Kansas', KY: 'Kentucky', LA: 'Louisiana', ME: 'Maine', MD: 'Maryland',
+  MA: 'Massachusetts', MI: 'Michigan', MN: 'Minnesota', MS: 'Mississippi', MO: 'Missouri',
+  MT: 'Montana', NE: 'Nebraska', NV: 'Nevada', NH: 'New Hampshire', NJ: 'New Jersey',
+  NM: 'New Mexico', NY: 'New York', NC: 'North Carolina', ND: 'North Dakota', OH: 'Ohio',
+  OK: 'Oklahoma', OR: 'Oregon', PA: 'Pennsylvania', RI: 'Rhode Island', SC: 'South Carolina',
+  SD: 'South Dakota', TN: 'Tennessee', TX: 'Texas', UT: 'Utah', VT: 'Vermont',
+  VA: 'Virginia', WA: 'Washington', WV: 'West Virginia', WI: 'Wisconsin', WY: 'Wyoming',
+  DC: 'Washington D.C.',
+};
+
+// NWS text abbreviations → spoken equivalents (for instruction text)
+const NWS_ABBREVS = [
+  [/\bNM\b/g,   'nautical miles'],
+  [/\bKT\b/g,   'knots'],
+  [/\bMPH\b/g,  'miles per hour'],
+  [/\bMPG\b/g,  'miles per gallon'],
+  [/\bFT\b/g,   'feet'],
+  [/\bIN\b/g,   'inches'],
+  [/\bF\b/g,    'degrees Fahrenheit'],
+  [/\bC\b/g,    'degrees Celsius'],
+  [/\bWSW\b/g,  'west-southwest'],
+  [/\bWNW\b/g,  'west-northwest'],
+  [/\bENE\b/g,  'east-northeast'],
+  [/\bESE\b/g,  'east-southeast'],
+  [/\bSSW\b/g,  'south-southwest'],
+  [/\bSSE\b/g,  'south-southeast'],
+  [/\bNNW\b/g,  'north-northwest'],
+  [/\bNNE\b/g,  'north-northeast'],
+  [/\bNW\b/g,   'northwest'],
+  [/\bNE\b/g,   'northeast'],
+  [/\bSW\b/g,   'southwest'],
+  [/\bSE\b/g,   'southeast'],
+  [/\bN\b/g,    'north'],
+  [/\bS\b/g,    'south'],
+  [/\bE\b/g,    'east'],
+  [/\bW\b/g,    'west'],
+];
+
+function expandAbbrevs(text) {
+  let out = text;
+  for (const [pattern, replacement] of NWS_ABBREVS) {
+    out = out.replace(pattern, replacement);
+  }
+  return out;
+}
+
+function expandAreaDesc(areaDesc) {
+  // areaDesc entries look like "Cherokee, KS" or "Jasper, MO"
+  return areaDesc.replace(/\b([A-Z]{2})\b/g, (match) => STATE_NAMES[match] || match);
+}
+
 function buildSentences(event, areaDesc, instruction, safetySteps) {
   const sentences = [];
 
@@ -37,7 +93,7 @@ function buildSentences(event, areaDesc, instruction, safetySteps) {
   if (areaDesc) {
     const counties = areaDesc
       .split(/[;]/)
-      .map(s => s.trim())
+      .map(s => expandAreaDesc(s.trim()))
       .filter(Boolean)
       .slice(0, 6)
       .join(', ');
@@ -46,7 +102,7 @@ function buildSentences(event, areaDesc, instruction, safetySteps) {
 
   if (instruction && instruction.trim().length > 10) {
     // Split NWS instruction on sentence boundaries for individual pauses
-    const chunks = instruction.trim()
+    const chunks = expandAbbrevs(instruction.trim())
       .split(/(?<=[.!?])\s+/)
       .map(s => s.trim())
       .filter(Boolean);
