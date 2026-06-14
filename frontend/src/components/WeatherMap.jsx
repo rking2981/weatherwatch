@@ -10,7 +10,6 @@ import TileWMS from 'ol/source/TileWMS';
 import GeoJSON from 'ol/format/GeoJSON';
 import { fromLonLat, transformExtent } from 'ol/proj';
 import { Style, Fill, Stroke } from 'ol/style';
-import Overlay from 'ol/Overlay';
 import { defaults as defaultControls } from 'ol/control';
 import RadarLegend from './RadarLegend';
 import 'ol/ol.css';
@@ -116,12 +115,9 @@ export default function WeatherMap({ alerts, selectedAlert, topAlert, pulseAlert
   const mapRef = useRef(null);
   const mapInstance = useRef(null);
   const alertLayerRef = useRef(null);
-  const popupRef = useRef(null);
-  const overlayRef = useRef(null);
   const radarLayerRef = useRef(null);
   const pulseRef = useRef({ id: null, phase: false });
   const [showRadar, setShowRadar] = useState(true);
-  const [popupContent, setPopupContent] = useState(null);
   const [radarRefreshedAt, setRadarRefreshedAt] = useState(new Date());
 
   // Initialize map once
@@ -154,18 +150,10 @@ export default function WeatherMap({ alerts, selectedAlert, topAlert, pulseAlert
     const alertLayer = new VectorLayer({ source: alertSource, style: alertStyle });
     alertLayerRef.current = alertLayer;
 
-    const overlay = new Overlay({
-      element: popupRef.current,
-      positioning: 'bottom-center',
-      offset: [0, -8],
-      stopEvent: false,
-    });
-    overlayRef.current = overlay;
-
     const map = new Map({
       target: mapRef.current,
       layers: [osmLayer, radarLayer, alertLayer, labelsLayer],
-      overlays: [overlay],
+      overlays: [],
       controls: defaultControls({ zoom: false, attribution: true }),
       view: new View({
         center: fromLonLat([-98.5795, 39.8283]),
@@ -182,17 +170,8 @@ export default function WeatherMap({ alerts, selectedAlert, topAlert, pulseAlert
         const f = features[0];
         const props = f.getProperties();
         const id = f.getId() || props.id;
-        setPopupContent({
-          event: props.event,
-          severity: props.severity,
-          areaDesc: props.areaDesc,
-          headline: props.headline,
-        });
-        overlay.setPosition(evt.coordinate);
         onAlertClick({ id, properties: { ...props, id } });
       } else {
-        overlay.setPosition(undefined);
-        setPopupContent(null);
         onAlertClick(null);
       }
     });
@@ -325,15 +304,6 @@ export default function WeatherMap({ alerts, selectedAlert, topAlert, pulseAlert
         </button>
       </div>
 
-      <div ref={popupRef} className="map-popup">
-        {popupContent && (
-          <>
-            <div className="popup-event">{popupContent.event}</div>
-            <div className="popup-area">{popupContent.areaDesc}</div>
-            {popupContent.headline && <div className="popup-headline">{popupContent.headline}</div>}
-          </>
-        )}
-      </div>
     </div>
   );
 }

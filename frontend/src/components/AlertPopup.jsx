@@ -90,7 +90,7 @@ function parseCounties(areaDesc) {
   return counties.join(', ');
 }
 
-export default function AlertPopup({ alerts, onDismiss, onZoom, onTuneRadio }) {
+export default function AlertPopup({ alerts, onDismiss, onZoom, onTuneRadio, silent = false }) {
   const [index, setIndex] = useState(0);
   const [visible, setVisible] = useState(true);
   const [copied, setCopied] = useState(false);
@@ -116,11 +116,11 @@ export default function AlertPopup({ alerts, onDismiss, onZoom, onTuneRadio }) {
   const safety = getSafetyActions(p.event, sev);
   const bulletin = parseBulletin(p.description, p.instruction, p.parameters);
 
-  // Play severity-specific sound when alert changes
+  // Play severity-specific sound when alert changes (suppressed for map-click popups)
   useEffect(() => {
     setVisible(true);
     setShowBulletin(false);
-    playAlertSound(alerts[index]?.properties?.severity);
+    if (!silent) playAlertSound(alerts[index]?.properties?.severity);
   }, [index, alerts.length]);
 
   function dismiss() {

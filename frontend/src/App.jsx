@@ -18,6 +18,7 @@ export default function App() {
   const [selectedAlert, setSelectedAlert] = useState(null);
   const [panel, setPanel] = useState(null); // null | 'alerts' | 'locations'
   const [popupAlerts, setPopupAlerts] = useState([]);
+  const [mapClickAlert, setMapClickAlert] = useState(null);
 
   useEffect(() => { subscribeToPush(); }, []);
 
@@ -26,9 +27,18 @@ export default function App() {
     if (newAlerts.length > 0) setPopupAlerts(newAlerts);
   }, [newAlerts]);
 
+  function handleMapAlertClick(clickedAlert) {
+    if (!clickedAlert) { setMapClickAlert(null); return; }
+    // Find the full alert object from the alerts array by id
+    const id = clickedAlert.id || clickedAlert.properties?.id;
+    const full = alerts.find(a => a.id === id || a.properties?.id === id) || clickedAlert;
+    setSelectedAlert(full);
+    setMapClickAlert([full]);
+  }
+
   return (
     <div className="app">
-      <WeatherMap alerts={alerts} selectedAlert={selectedAlert} topAlert={topAlert} pulseAlertId={popupAlerts[0]?.id || null} onAlertClick={setSelectedAlert} />
+      <WeatherMap alerts={alerts} selectedAlert={selectedAlert} topAlert={topAlert} pulseAlertId={popupAlerts[0]?.id || null} onAlertClick={handleMapAlertClick} />
 
       {/* Threat summary banner — top of map, shows latest alert */}
       <ThreatBanner topAlert={latestAlert} />
@@ -74,11 +84,25 @@ export default function App() {
       {/* News ticker at bottom */}
       <NewsTicker alerts={alerts} latestAlert={latestAlert} onSelect={setSelectedAlert} />
 
-      {/* New alert popup */}
+      {/* New alert popup (from polling) */}
       {popupAlerts.length > 0 && (
         <AlertPopup
           alerts={popupAlerts}
           onDismiss={() => setPopupAlerts([])}
+          onZoom={a => setSelectedAlert(a)}
+          onTuneRadio={a => {
+            const s = stationForAlert(a);
+            if (s) { radio.tuneToStation(s); setPanel('radio'); }
+          }}
+        />
+      )}
+
+      {/* Map polygon click popup */}
+      {mapClickAlert && popupAlerts.length === 0 && (
+        <AlertPopup
+          alerts={mapClickAlert}
+          silent
+          onDismiss={() => setMapClickAlert(null)}
           onZoom={a => setSelectedAlert(a)}
           onTuneRadio={a => {
             const s = stationForAlert(a);
