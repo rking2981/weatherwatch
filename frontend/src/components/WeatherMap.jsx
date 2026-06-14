@@ -123,7 +123,7 @@ const DESTRUCTIVE_WIND_MPH = 80;
 
 // Cache Icon instances by URL so OL doesn't reload the same image repeatedly
 const iconCache = {};
-function getIcon(url, scale = 0.07) {
+function getIcon(url, scale = 0.35) {
   const key = `${url}_${scale}`;
   if (!iconCache[key]) {
     iconCache[key] = new Icon({ src: url, scale, crossOrigin: 'anonymous' });
