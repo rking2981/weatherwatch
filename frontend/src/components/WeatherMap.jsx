@@ -64,8 +64,11 @@ const EVENT_COLORS = {
 };
 
 // Flaticon CDN — colored illustrated weather icons
-// Format: https://cdn-icons-png.flaticon.com/512/{id}.png
-const FI = id => `https://cdn-icons-png.flaticon.com/512/${id}.png`;
+// Correct format: /128/{first4digits}/{fullid}.png
+const FI = id => {
+  const sub = String(id).slice(0, 4);
+  return `https://cdn-icons-png.flaticon.com/128/${sub}/${id}.png`;
+};
 
 const EVENT_ICONS = {
   // Tornado
@@ -84,7 +87,7 @@ const EVENT_ICONS = {
   'Flood Advisory':                FI(2675268),
   'Hydrologic Outlook':            FI(2675268),
   // Winter
-  'Blizzard Warning':              FI(642000),   // blizzard/snowstorm
+  'Blizzard Warning':              FI(3222794),  // snowstorm cloud
   'Winter Storm Warning':          FI(2315309),  // winter storm cloud snow
   'Winter Storm Watch':            FI(2315309),
   'Winter Weather Advisory':       FI(2315309),
