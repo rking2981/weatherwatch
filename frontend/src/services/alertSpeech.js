@@ -1,13 +1,13 @@
 // Text-to-speech for weather alerts using the Web Speech API.
 // Reads: event name, affected counties, NWS instruction or safety steps.
+// Sentences are queued as separate utterances with a short pause between each.
 
 let speaking = false;
+let pauseTimers = [];
 
 function getBestVoice() {
   const voices = window.speechSynthesis.getVoices();
-  // Prefer high-quality English neural/natural voices in order of quality
   const preferred = [
-    // Windows — Microsoft Neural voices (very realistic)
     v => /microsoft.*natural/i.test(v.name),
     v => /microsoft.*aria/i.test(v.name),
     v => /microsoft.*jenny/i.test(v.name),
@@ -15,14 +15,11 @@ function getBestVoice() {
     v => /microsoft.*davis/i.test(v.name),
     v => /microsoft.*tony/i.test(v.name),
     v => /microsoft/i.test(v.name) && v.lang.startsWith('en'),
-    // macOS / iOS — Siri-quality voices
     v => /samantha/i.test(v.name),
     v => /karen/i.test(v.name),
     v => /daniel/i.test(v.name),
-    // Generic English fallback
     v => v.lang.startsWith('en'),
   ];
-
   for (const test of preferred) {
     const match = voices.find(test);
     if (match) return match;
@@ -30,16 +27,13 @@ function getBestVoice() {
   return null;
 }
 
-function buildScript(event, areaDesc, instruction, safetySteps) {
-  const parts = [];
+function buildSentences(event, areaDesc, instruction, safetySteps) {
+  const sentences = [];
 
-  // Attention tone phrase
-  parts.push('Attention. Weather alert.');
+  sentences.push('Attention. Weather alert.');
 
-  // Event name
-  if (event) parts.push(`${event}.`);
+  if (event) sentences.push(`${event}.`);
 
-  // Counties / area — clean up the raw areaDesc string
   if (areaDesc) {
     const counties = areaDesc
       .split(/[;]/)
@@ -47,63 +41,90 @@ function buildScript(event, areaDesc, instruction, safetySteps) {
       .filter(Boolean)
       .slice(0, 6)
       .join(', ');
-    parts.push(`Affected areas: ${counties}.`);
+    sentences.push(`Affected areas: ${counties}.`);
   }
 
-  // NWS instruction text takes priority over generated safety steps
   if (instruction && instruction.trim().length > 10) {
-    parts.push(instruction.trim());
+    // Split NWS instruction on sentence boundaries for individual pauses
+    const chunks = instruction.trim()
+      .split(/(?<=[.!?])\s+/)
+      .map(s => s.trim())
+      .filter(Boolean);
+    sentences.push(...chunks);
   } else if (safetySteps && safetySteps.length > 0) {
-    parts.push('Safety instructions:');
+    sentences.push('Safety instructions.');
     safetySteps.forEach((step, i) => {
-      parts.push(`${i + 1}. ${step}`);
+      sentences.push(`${i + 1}. ${step}`);
     });
   }
 
-  return parts.join(' ');
+  return sentences;
+}
+
+function makeUtterance(text, voice) {
+  const utter = new SpeechSynthesisUtterance(text);
+  if (voice) utter.voice = voice;
+  utter.rate = 0.92;
+  utter.pitch = 1.0;
+  utter.volume = 1.0;
+  utter.lang = 'en-US';
+  return utter;
+}
+
+// Queue sentences with a 400ms pause between each
+function queueSentences(sentences, voice) {
+  let delay = 0;
+  sentences.forEach((text, i) => {
+    const utter = makeUtterance(text, voice);
+
+    if (i === sentences.length - 1) {
+      utter.onend = () => { speaking = false; };
+    }
+    utter.onerror = () => { speaking = false; };
+
+    if (i === 0) {
+      window.speechSynthesis.speak(utter);
+    } else {
+      // Pause: speak a near-silent utterance as a gap, then the real sentence
+      const pause = makeUtterance(' ', voice); // non-breaking space
+      pause.rate = 10; // speak it instantly
+      pause.volume = 0;
+      pause.onend = () => {
+        const t = setTimeout(() => {
+          if (speaking) window.speechSynthesis.speak(utter);
+        }, 350);
+        pauseTimers.push(t);
+      };
+      window.speechSynthesis.speak(pause);
+    }
+  });
 }
 
 export function speakAlert({ event, areaDesc, instruction, safetySteps }) {
   if (!window.speechSynthesis) return;
 
-  // Cancel any ongoing speech first
   window.speechSynthesis.cancel();
-  speaking = false;
+  pauseTimers.forEach(clearTimeout);
+  pauseTimers = [];
+  speaking = true;
 
-  const text = buildScript(event, areaDesc, instruction, safetySteps);
-  const utter = new SpeechSynthesisUtterance(text);
-
-  // Voices may not be loaded yet — wait if needed
-  const assign = () => {
-    const voice = getBestVoice();
-    if (voice) utter.voice = voice;
-    utter.rate = 0.92;   // slightly slower — clearer for emergency info
-    utter.pitch = 1.0;
-    utter.volume = 1.0;
-    utter.lang = 'en-US';
-  };
+  const sentences = buildSentences(event, areaDesc, instruction, safetySteps);
 
   const voices = window.speechSynthesis.getVoices();
   if (voices.length > 0) {
-    assign();
-    window.speechSynthesis.speak(utter);
-    speaking = true;
+    queueSentences(sentences, getBestVoice());
   } else {
-    // Voices load asynchronously on first call
     window.speechSynthesis.onvoiceschanged = () => {
-      assign();
-      window.speechSynthesis.speak(utter);
-      speaking = true;
+      queueSentences(sentences, getBestVoice());
       window.speechSynthesis.onvoiceschanged = null;
     };
   }
-
-  utter.onend = () => { speaking = false; };
-  utter.onerror = () => { speaking = false; };
 }
 
 export function stopSpeech() {
   if (window.speechSynthesis) window.speechSynthesis.cancel();
+  pauseTimers.forEach(clearTimeout);
+  pauseTimers = [];
   speaking = false;
 }
 
