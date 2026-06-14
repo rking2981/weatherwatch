@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { playAlertSound } from '../services/alertSound';
 import { getSafetyActions } from '../services/safetyActions';
+import { speakAlert, stopSpeech } from '../services/alertSpeech';
 import './AlertPopup.css';
 
 function parseBulletin(desc, instruction, params) {
@@ -95,6 +96,7 @@ export default function AlertPopup({ alerts, onDismiss, onZoom, onTuneRadio, sil
   const [visible, setVisible] = useState(true);
   const [copied, setCopied] = useState(false);
   const [showBulletin, setShowBulletin] = useState(false);
+  const [muted, setMuted] = useState(false);
 
   const alert = alerts[index];
   const p = alert?.properties || {};
@@ -116,12 +118,26 @@ export default function AlertPopup({ alerts, onDismiss, onZoom, onTuneRadio, sil
   const safety = getSafetyActions(p.event, sev);
   const bulletin = parseBulletin(p.description, p.instruction, p.parameters);
 
-  // Play severity-specific sound when alert changes (suppressed for map-click popups)
+  // Play sound and speak alert when alert changes (suppressed for map-click popups)
   useEffect(() => {
     setVisible(true);
     setShowBulletin(false);
-    if (!silent) playAlertSound(alerts[index]?.properties?.severity);
+    if (silent) return;
+    const a = alerts[index];
+    const ap = a?.properties || {};
+    playAlertSound(ap.severity);
+    if (!muted) {
+      speakAlert({
+        event: ap.event,
+        areaDesc: ap.areaDesc,
+        instruction: ap.instruction,
+        safetySteps: getSafetyActions(ap.event, ap.severity)?.steps,
+      });
+    }
   }, [index, alerts.length]);
+
+  // Stop speech when popup is hidden or unmounted
+  useEffect(() => () => stopSpeech(), []);
 
   function dismiss() {
     if (index < alerts.length - 1) {
@@ -147,7 +163,28 @@ export default function AlertPopup({ alerts, onDismiss, onZoom, onTuneRadio, sil
             <div className="popup-expires">EXPIRES IN {expires}</div>
           )}
         </div>
-        <button className="popup-close" onClick={onDismiss}>✕</button>
+        <div className="popup-header-actions">
+          <button
+            className="popup-mute"
+            title={muted ? 'Unmute voice' : 'Mute voice'}
+            onClick={() => {
+              if (!muted) stopSpeech();
+              else if (!silent) {
+                const ap = alerts[index]?.properties || {};
+                speakAlert({
+                  event: ap.event,
+                  areaDesc: ap.areaDesc,
+                  instruction: ap.instruction,
+                  safetySteps: getSafetyActions(ap.event, ap.severity)?.steps,
+                });
+              }
+              setMuted(m => !m);
+            }}
+          >
+            {muted ? '🔇' : '🔊'}
+          </button>
+          <button className="popup-close" onClick={onDismiss}>✕</button>
+        </div>
       </div>
 
       <div className="popup-body">

@@ -151,7 +151,16 @@
   letter-spacing: 1.5px;
 }
 
-.popup-close {
+.popup-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.popup-close,
+.popup-mute {
   background: rgba(0,0,0,0.25);
   color: rgba(255,255,255,0.8);
   border: none;
@@ -162,13 +171,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
   cursor: pointer;
-  margin-top: 2px;
   transition: background 0.15s;
 }
 
-.popup-close:hover { background: rgba(0,0,0,0.5); color: #fff; }
+.popup-close:hover,
+.popup-mute:hover { background: rgba(0,0,0,0.5); color: #fff; }
 
 /* Body */
 .popup-body {
