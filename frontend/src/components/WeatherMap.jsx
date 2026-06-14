@@ -167,7 +167,11 @@ export default function WeatherMap({ alerts, selectedAlert, topAlert, pulseAlert
         layerFilter: l => l === alertLayer,
       });
       if (features && features.length > 0) {
-        const f = features[0];
+        const SEVERITY_RANK = { Extreme: 0, Severe: 1, Moderate: 2, Minor: 3, Unknown: 4 };
+        const sorted = [...features].sort((a, b) =>
+          (SEVERITY_RANK[a.get('severity')] ?? 4) - (SEVERITY_RANK[b.get('severity')] ?? 4)
+        );
+        const f = sorted[0];
         const props = f.getProperties();
         const id = f.getId() || props.id;
         onAlertClick({ id, properties: { ...props, id } });
