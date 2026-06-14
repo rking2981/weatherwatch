@@ -243,13 +243,18 @@ export default function WeatherMap({ alerts, selectedAlert, topAlert, pulseAlert
     });
 
     map.on('click', evt => {
-      // Only check vector layers (alert polygons) — skip tile layers
-      const features = map.getFeaturesAtPixel(evt.pixel, {
-        layerFilter: l => l === alertLayer,
+      const coord = evt.coordinate;
+
+      // Collect only features whose polygon geometry actually contains the click point
+      const hits = [];
+      alertLayerRef.current.getSource().getFeatures().forEach(f => {
+        const geom = f.getGeometry();
+        if (geom && geom.intersectsCoordinate(coord)) hits.push(f);
       });
-      if (features && features.length > 0) {
+
+      if (hits.length > 0) {
         const SEVERITY_RANK = { Extreme: 0, Severe: 1, Moderate: 2, Minor: 3, Unknown: 4 };
-        const sorted = [...features].sort((a, b) =>
+        const sorted = [...hits].sort((a, b) =>
           (SEVERITY_RANK[a.get('severity')] ?? 4) - (SEVERITY_RANK[b.get('severity')] ?? 4)
         );
         const f = sorted[0];
