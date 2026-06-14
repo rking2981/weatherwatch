@@ -1,0 +1,124 @@
+.watchlist {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+
+.watchlist-form {
+  padding: 14px 12px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.watchlist-form h3 {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.watchlist-form input {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  padding: 7px 10px;
+  font-size: 0.875rem;
+  outline: none;
+  font-family: inherit;
+}
+
+.watchlist-form input:focus { border-color: var(--accent); }
+
+.coord-row {
+  display: flex;
+  gap: 6px;
+}
+
+.coord-row input { flex: 1; }
+
+.btn-geo {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 1rem;
+  color: var(--text);
+}
+
+.btn-geo:hover { border-color: var(--accent); }
+
+.btn-add {
+  background: var(--accent);
+  color: #000;
+  font-weight: 600;
+  padding: 8px;
+  font-size: 0.875rem;
+}
+
+.btn-add:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.wl-error {
+  font-size: 0.8rem;
+  color: var(--danger);
+}
+
+.watchlist-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.wl-empty {
+  padding: 24px 8px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.wl-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 12px;
+}
+
+.wl-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.wl-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.wl-coords {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.btn-remove {
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.btn-remove:hover {
+  color: var(--danger);
+  background: rgba(239,83,80,0.1);
+}

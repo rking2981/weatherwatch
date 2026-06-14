@@ -1,0 +1,82 @@
+.weather-map-wrap {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.weather-map {
+  width: 100%;
+  height: 100%;
+}
+
+.map-controls {
+  position: absolute;
+  top: 228px;
+  right: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 100;
+}
+
+.map-toggle {
+  background: rgba(15, 15, 26, 0.88);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.5);
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.map-toggle:hover { border-color: var(--accent); color: var(--accent); }
+.map-toggle.active { border-color: var(--accent); color: var(--accent); }
+
+.map-popup {
+  background: rgba(15, 15, 26, 0.94);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  max-width: 280px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+  pointer-events: none;
+  backdrop-filter: blur(8px);
+}
+
+.popup-event {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--warn);
+  margin-bottom: 4px;
+}
+
+.popup-area {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.popup-headline {
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: var(--text);
+}
+
+.ol-attribution {
+  bottom: 166px !important; /* above ticker */
+  background: rgba(15,15,26,0.7) !important;
+  color: var(--text-muted) !important;
+  font-size: 0.7rem !important;
+}
+
+.ol-attribution a { color: var(--accent) !important; }
+
+.ol-zoom {
+  bottom: 70px !important;
+  top: unset !important;
+  left: unset !important;
+  right: 14px !important;
+}

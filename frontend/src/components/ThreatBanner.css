@@ -1,0 +1,70 @@
+.threat-banner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 300;
+  display: flex;
+  align-items: stretch;
+  min-height: 58px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.6);
+  animation: banner-drop 0.35s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+@keyframes banner-drop {
+  from { transform: translateY(-100%); opacity: 0; }
+  to   { transform: translateY(0);     opacity: 1; }
+}
+
+.threat-banner-inner {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+}
+
+.threat-banner-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.threat-banner-nws {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.85);
+  letter-spacing: 0.5px;
+  text-align: center;
+  font-style: italic;
+}
+
+.threat-banner-text {
+  font-size: 1.45rem;
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  text-shadow: 1px 1px 4px rgba(0,0,0,0.5);
+  line-height: 1.2;
+}
+
+.threat-banner-close {
+  background: rgba(0,0,0,0.2);
+  color: rgba(255,255,255,0.7);
+  border: none;
+  border-left: 1px solid rgba(255,255,255,0.15);
+  border-radius: 0;
+  padding: 0 18px;
+  font-size: 1rem;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s;
+}
+
+.threat-banner-close:hover {
+  background: rgba(0,0,0,0.35);
+  color: #fff;
+}

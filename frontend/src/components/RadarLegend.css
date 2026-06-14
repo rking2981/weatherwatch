@@ -1,0 +1,111 @@
+.radar-legend {
+  position: absolute;
+  top: 72px;
+  right: 14px;
+  width: 300px;
+  z-index: 350;
+  background: rgba(4, 6, 16, 0.93);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 6px;
+  padding: 12px 14px 10px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.7);
+  font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+/* ── Header row: LOCAL RADAR + clock ── */
+.radar-legend-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.radar-legend-title {
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.radar-legend-clock {
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
+}
+
+.radar-clock-time {
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: 1px;
+  font-variant-numeric: tabular-nums;
+}
+
+.radar-clock-ampm {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #00d4ff;
+  letter-spacing: 0.5px;
+}
+
+/* ── Cyan accent divider under title ── */
+.radar-legend-divider {
+  height: 3px;
+  width: 48px;
+  background: #00d4ff;
+  border-radius: 2px;
+  margin-bottom: 10px;
+}
+
+/* ── Gradient color bar ── */
+.radar-scale-bar {
+  height: 14px;
+  border-radius: 2px;
+  margin-bottom: 5px;
+  background: linear-gradient(to right,
+    #00d4ff 0%,
+    #00ff00 18%,
+    #ffff00 36%,
+    #ff8800 54%,
+    #ff0000 72%,
+    #cc00cc 88%,
+    #ffffff 100%
+  );
+}
+
+/* ── Labels ── */
+.radar-scale-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: rgba(255,255,255,0.55);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+/* ── Footer: station + region ── */
+.radar-legend-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  padding-top: 8px;
+}
+
+.radar-station {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.45);
+  letter-spacing: 0.8px;
+}
+
+.radar-region {
+  font-size: 0.72rem;
+  font-weight: 900;
+  color: #00d4ff;
+  letter-spacing: 1px;
+}

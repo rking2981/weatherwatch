@@ -1,0 +1,212 @@
+.news-ticker {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 160px;
+  display: flex;
+  flex-direction: column;
+  z-index: 400;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: transparent;
+  border-top: none;
+  box-shadow: none;
+}
+
+/* ── Top row ── */
+.ticker-top-row {
+  display: flex;
+  align-items: stretch;
+  flex: 1;
+  overflow: hidden;
+  background: #1a0a08;
+  border-top: 3px solid var(--ticker-bg, #7f0000);
+  box-shadow: 0 -4px 32px rgba(0,0,0,0.85);
+}
+
+/* Left clock block */
+.ticker-clock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 18px;
+  flex-shrink: 0;
+  min-width: 150px;
+  border-right: 1px solid rgba(255,255,255,0.08);
+  gap: 2px;
+}
+
+.ticker-time {
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: 1px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.ticker-date {
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.45);
+  letter-spacing: 0.8px;
+}
+
+.ticker-tz {
+  font-size: 0.58rem;
+  color: rgba(255,255,255,0.3);
+  letter-spacing: 0.5px;
+}
+
+/* Center alert summary */
+.ticker-alert-block {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0 18px;
+  overflow: hidden;
+}
+
+.ticker-headline-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+}
+
+.ticker-top-label {
+  font-size: 1.95rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+  color: #e53935;
+  background: transparent !important;
+  padding: 0;
+  border-radius: 0;
+  white-space: nowrap;
+  flex-shrink: 0;
+  text-transform: uppercase;
+}
+
+.ticker-summary {
+  font-size: 1.95rem;
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.7);
+}
+
+.ticker-counties {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.7);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ticker-clear {
+  color: rgba(255,255,255,0.4);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.ticker-alert-block:hover .ticker-summary:not(.ticker-clear) {
+  color: #ffe082;
+}
+
+/* Right: event + expires */
+.ticker-right-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0 20px;
+  border-left: 1px solid rgba(255,255,255,0.08);
+  flex-shrink: 0;
+  min-width: 180px;
+  gap: 4px;
+}
+
+.ticker-event-name {
+  font-size: 1.3rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-align: right;
+  line-height: 1.1;
+}
+
+.ticker-expires {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.6);
+  letter-spacing: 1px;
+}
+
+/* ── Bottom row ── */
+.ticker-bottom-row {
+  display: flex;
+  align-items: center;
+  height: 36px;
+  flex-shrink: 0;
+  background: rgba(4, 4, 12, 0.97);
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+.ticker-bottom-label {
+  font-size: 0.62rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: #fff;
+  padding: 0 14px;
+  flex-shrink: 0;
+  text-transform: uppercase;
+  border-right: 1px solid rgba(255,255,255,0.1);
+  white-space: nowrap;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.ticker-track {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.ticker-text {
+  display: inline-block;
+  white-space: nowrap;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #c8c8e0;
+  padding-left: 100%;
+  animation: ticker-scroll linear infinite;
+  letter-spacing: 0.3px;
+}
+
+.ticker-alert-name    { font-weight: 800; }
+.ticker-alert-area    { color: #c8c8e0; }
+.ticker-sep           { color: #44445a; }
+.ticker-safety-label  { font-weight: 900; letter-spacing: 0.5px; }
+.ticker-safety-step   { color: #dcdcf0; font-weight: 500; }
+
+@keyframes ticker-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-100%); }
+}
+
+.ticker-track:hover .ticker-text {
+  animation-play-state: paused;
+}

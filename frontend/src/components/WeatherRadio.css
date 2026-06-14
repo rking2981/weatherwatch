@@ -1,0 +1,248 @@
+.weather-radio {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+/* ── Player bar ── */
+.radio-player {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: rgba(0,0,0,0.3);
+  border-bottom: 1px solid var(--border);
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.radio-player-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  overflow: hidden;
+}
+
+.radio-icon { font-size: 1.4rem; flex-shrink: 0; }
+
+.radio-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+}
+
+.radio-callsign {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--accent);
+  letter-spacing: 1px;
+}
+
+.radio-location {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.radio-autotuned {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--warn);
+  background: rgba(255,152,0,0.15);
+  border: 1px solid rgba(255,152,0,0.3);
+  border-radius: 4px;
+  padding: 1px 6px;
+  width: fit-content;
+}
+
+.radio-idle {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.radio-player-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.radio-loading { font-size: 0.85rem; }
+
+.radio-play-btn {
+  background: var(--accent);
+  color: #000;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  transition: opacity 0.15s;
+  padding: 0;
+}
+
+.radio-play-btn:disabled { opacity: 0.4; cursor: not-allowed; background: var(--border); }
+.radio-play-btn.playing  { background: var(--danger); color: #fff; }
+
+.radio-mute-btn {
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 1rem;
+  padding: 4px;
+  border-radius: 4px;
+  transition: color 0.15s;
+}
+
+.radio-mute-btn:hover, .radio-mute-btn.muted { color: var(--warn); }
+
+.radio-volume {
+  width: 70px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+/* ── Tabs ── */
+.radio-tabs {
+  display: flex;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+  background: rgba(0,0,0,0.2);
+}
+
+.radio-tab {
+  flex: 1;
+  background: transparent;
+  color: var(--text-muted);
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 8px 0;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+  font-family: inherit;
+}
+
+.radio-tab:hover { color: var(--text); }
+
+.radio-tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+/* ── Station browser ── */
+.radio-station-browser {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+  padding: 10px 12px 0;
+  gap: 8px;
+}
+
+.radio-search {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  padding: 7px 10px;
+  font-size: 0.85rem;
+  outline: none;
+  font-family: inherit;
+  flex-shrink: 0;
+}
+
+.radio-search:focus { border-color: var(--accent); }
+
+.radio-station-list {
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.radio-state-group { margin-bottom: 4px; }
+
+.radio-state-label {
+  font-size: 0.65rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: var(--text-muted);
+  padding: 6px 4px 3px;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2px;
+}
+
+.radio-station-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  color: var(--text);
+  border-radius: 6px;
+  padding: 7px 10px;
+  font-size: 0.85rem;
+  text-align: left;
+  transition: background 0.12s;
+  border: 1px solid transparent;
+}
+
+.radio-station-btn:hover {
+  background: var(--surface2);
+  border-color: var(--border);
+}
+
+.radio-station-btn.active {
+  background: rgba(79,195,247,0.08);
+  border-color: var(--accent);
+}
+
+.station-callsign {
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: var(--accent);
+  min-width: 58px;
+  letter-spacing: 0.5px;
+}
+
+.station-city {
+  flex: 1;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+}
+
+.station-live {
+  font-size: 0.62rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+  color: #fff;
+  background: var(--danger);
+  border-radius: 4px;
+  padding: 2px 6px;
+  animation: pulse-live 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-live {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.5; }
+}
+
+.radio-no-results {
+  padding: 20px 0;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
