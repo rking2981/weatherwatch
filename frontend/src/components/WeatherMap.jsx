@@ -152,11 +152,23 @@ function alertStyle(feature) {
 
   const iconUrl = EVENT_ICONS[event];
 
-  return new Style({
+  const polyStyle = new Style({
     fill:   new Fill({ color: colors.fill }),
     stroke: new Stroke({ color: colors.stroke, width: colors.width }),
-    image: iconUrl ? getIcon(iconUrl) : undefined,
   });
+
+  if (!iconUrl) return polyStyle;
+
+  // Icon must be placed on a Point geometry — use the polygon's interior point
+  const iconStyle = new Style({
+    geometry: feature => {
+      const geom = feature.getGeometry();
+      return geom?.getInteriorPoint?.() ?? geom;
+    },
+    image: getIcon(iconUrl),
+  });
+
+  return [polyStyle, iconStyle];
 }
 
 function alertExtent(alert) {
@@ -342,14 +354,20 @@ export default function WeatherMap({ alerts, selectedAlert, topAlert, pulseAlert
           const ev      = feature.get('event');
           const base    = EVENT_COLORS[ev] || { stroke: '#ffffff', fill: 'rgba(255,255,255,0.2)', width: 2 };
           const iconUrl = EVENT_ICONS[ev];
-          feature.setStyle(new Style({
+          const styles = [new Style({
             fill: new Fill({ color: base.fill }),
             stroke: new Stroke({
               color: bright ? '#ffffff' : base.stroke,
               width: bright ? base.width + 2.5 : base.width,
             }),
-            image: iconUrl ? getIcon(iconUrl) : undefined,
-          }));
+          })];
+          if (iconUrl) {
+            styles.push(new Style({
+              geometry: f => f.getGeometry()?.getInteriorPoint?.() ?? f.getGeometry(),
+              image: getIcon(iconUrl),
+            }));
+          }
+          feature.setStyle(styles);
         } else {
           feature.setStyle(null);
         }
