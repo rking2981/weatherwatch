@@ -64,59 +64,59 @@ const EVENT_COLORS = {
 };
 
 // Flaticon CDN — colored illustrated weather icons
-// Correct format: /128/{first4digits}/{fullid}.png
-const FI = id => {
-  const sub = String(id).slice(0, 4);
+// Subdirectory length varies by ID — resolved per-icon below
+const FI = (id, subLen = 4) => {
+  const sub = String(id).slice(0, subLen);
   return `https://cdn-icons-png.flaticon.com/128/${sub}/${id}.png`;
 };
 
 const EVENT_ICONS = {
   // Tornado
-  'Tornado Warning':               FI(9211885),  // hurricane/twister
+  'Tornado Warning':               FI(9211885),   // hurricane/twister
   'Tornado Watch':                 FI(9211885),
   'Tornado Emergency':             FI(9211885),
   // Severe Thunderstorm
-  'Severe Thunderstorm Warning':   FI(1146869),  // thunderstorm cloud lightning
-  'Severe Thunderstorm Watch':     FI(1146869),
+  'Severe Thunderstorm Warning':   FI(9755312),   // thunderstorm lightning
+  'Severe Thunderstorm Watch':     FI(9755312),
   // Flood
-  'Flash Flood Warning':           FI(3911414),  // flood wave
-  'Flash Flood Watch':             FI(3911414),
-  'Flash Flood Emergency':         FI(3911414),
-  'Flood Warning':                 FI(2675268),  // flood house
-  'Flood Watch':                   FI(2675268),
-  'Flood Advisory':                FI(2675268),
-  'Hydrologic Outlook':            FI(2675268),
+  'Flash Flood Warning':           FI(2811950),   // flood wave
+  'Flash Flood Watch':             FI(2811950),
+  'Flash Flood Emergency':         FI(2811950),
+  'Flood Warning':                 FI(2811950),
+  'Flood Watch':                   FI(2811950),
+  'Flood Advisory':                FI(2811950),
+  'Hydrologic Outlook':            FI(2811950),
   // Winter
-  'Blizzard Warning':              FI(3222794),  // snowstorm cloud
-  'Winter Storm Warning':          FI(2315309),  // winter storm cloud snow
-  'Winter Storm Watch':            FI(2315309),
-  'Winter Weather Advisory':       FI(2315309),
-  'Ice Storm Warning':             FI(2932694),  // ice crystal
-  'Freezing Rain Advisory':        FI(2932694),
-  'Wind Chill Warning':            FI(3222800),  // cold thermometer wind
-  'Wind Chill Advisory':           FI(3222800),
+  'Blizzard Warning':              FI(3886647),   // blizzard
+  'Winter Storm Warning':          FI(3886647),
+  'Winter Storm Watch':            FI(3886647),
+  'Winter Weather Advisory':       FI(3886647),
+  'Ice Storm Warning':             FI(2530064),   // ice/freezing
+  'Freezing Rain Advisory':        FI(2530064),
+  'Wind Chill Warning':            FI(2530064),
+  'Wind Chill Advisory':           FI(2530064),
   // Wind
-  'Extreme Wind Warning':          FI(3222788),  // strong wind
-  'High Wind Warning':             FI(3222788),
-  'High Wind Watch':               FI(3222788),
-  'Wind Advisory':                 FI(3222788),
+  'Extreme Wind Warning':          FI(5024369),   // wind
+  'High Wind Warning':             FI(5024369),
+  'High Wind Watch':               FI(5024369),
+  'Wind Advisory':                 FI(5024369),
+  'Dust Storm Warning':            FI(5024369),
   // Heat
-  'Excessive Heat Warning':        FI(2917231),  // heat thermometer sun
-  'Excessive Heat Watch':          FI(2917231),
-  'Heat Advisory':                 FI(2917231),
+  'Excessive Heat Warning':        FI(5782347),   // heat wave
+  'Excessive Heat Watch':          FI(5782347),
+  'Heat Advisory':                 FI(5782347),
   // Fog / Air
-  'Dense Fog Advisory':            FI(3222796),  // fog cloud
-  'Air Quality Alert':             FI(3418077),  // air pollution smog
+  'Dense Fog Advisory':            FI(7774309),   // fog
+  'Air Quality Alert':             FI(3418077),   // air pollution
   // Tropical
-  'Hurricane Warning':             FI(9211885),  // same cyclone icon
+  'Hurricane Warning':             FI(9211885),
   'Hurricane Watch':               FI(9211885),
   'Tropical Storm Warning':        FI(9211885),
   'Tropical Storm Watch':          FI(9211885),
   // Other
-  'Tsunami Warning':               FI(3911414),  // wave
-  'Dust Storm Warning':            FI(3222788),  // wind
-  'Special Weather Statement':     FI(1146869),  // storm cloud
-  'Special Marine Warning':        FI(3911424),  // ocean wave
+  'Tsunami Warning':               FI(9047187),   // tsunami wave
+  'Special Weather Statement':     FI(9755312),   // storm cloud
+  'Special Marine Warning':        FI(9047187),   // wave
 };
 
 const DESTRUCTIVE_WIND_MPH = 80;
